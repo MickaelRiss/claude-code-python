@@ -49,19 +49,17 @@ def main():
     )
 
     print("Response:", chat.choices[0])
+
     # Detect if tool_call
     if chat.choices[0].message.tool_calls:
-        # Get the message from the first choice, then extract the first tool call from the tool_calls array
         completion_message = chat.choices[0].message.content
-        print(completion_message)
         completion_first_tool = chat.choices[0].message.tool_calls[0]
-        print(completion_first_tool)
         tool_name = completion_first_tool.function.name
-        print(tool_name)
-        tool_argument = json.loads(completion_first_tool.function.arguments)
-        print(tool_argument)
+        file_path = json.loads(completion_first_tool.function.arguments)
 
-        #  Choice(finish_reason='stop', index=0, logprobs=None, message=ChatCompletionMessage(content='
+        if tool_name == "Read":
+            with open(file_path["file_path"], "r") as file:
+                print(file.read())
 
     if not chat.choices or len(chat.choices) == 0:
         raise RuntimeError("no choices in response")
