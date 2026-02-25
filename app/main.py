@@ -48,11 +48,7 @@ def main():
         tools=tools,
     )
 
-    print("Response:", chat.choices[0])
-
-    # Detect if tool_call
     if chat.choices[0].message.tool_calls:
-        completion_message = chat.choices[0].message.content
         completion_first_tool = chat.choices[0].message.tool_calls[0]
         tool_name = completion_first_tool.function.name
         file_path = json.loads(completion_first_tool.function.arguments)
@@ -66,7 +62,8 @@ def main():
 
     print("Logs from your program will appear here!", file=sys.stderr)
 
-    print(chat.choices[0].message.content)
+    if not chat.choices[0].message.tool_calls:
+        print(chat.choices[0].message.content)
 
 
 if __name__ == "__main__":
