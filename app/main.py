@@ -48,14 +48,11 @@ def main():
         tools=tools,
     )
 
-    if chat.choices[0].message.tool_calls:
-        completion_first_tool = chat.choices[0].message.tool_calls[0]
-        tool_name = completion_first_tool.function.name
-        file_path = json.loads(completion_first_tool.function.arguments)
-
-        if tool_name == "Read":
-            with open(file_path["file_path"], "r") as file:
-                print(file.read())
+    for tool_calls in chat.choices[0].message.tool_calls or []:
+        args = json.loads(tool_calls.function.arguments)
+        if tool_calls.function.name == "Read":
+            with open(args["file_path"]) as f:
+                print(f.read())
 
     if not chat.choices or len(chat.choices) == 0:
         raise RuntimeError("no choices in response")
