@@ -21,28 +21,30 @@ def main():
 
     client = OpenAI(api_key=API_KEY, base_url=BASE_URL)
 
+    tools = [
+        {
+            "type": "function",
+            "function": {
+                "name": "Read",
+                "description": "Read and return the contents of the file",
+                "parameters": {
+                    "type": "object",
+                    "properties": {
+                        "file_path": {
+                            "type": "string",
+                            "description": "The path to the file to read",
+                        }
+                    },
+                    "required": ["file_path"],
+                },
+            },
+        }
+    ]
+
     chat = client.chat.completions.create(
         model="anthropic/claude-haiku-4.5",
         messages=[{"role": "user", "content": args.p}],
-        tools=[
-            {
-                "type": "function",
-                "function": {
-                    "name": "Read",
-                    "description": "Read and return the contents of the file",
-                    "parameters": {
-                        "type": "object",
-                        "properties": {
-                            "file_path": {
-                                "type": "string",
-                                "description": "The path to the file to read",
-                            }
-                        },
-                        "required": ["file_path"],
-                    },
-                },
-            }
-        ],
+        tools=tools,
     )
 
     if not chat.choices or len(chat.choices) == 0:
