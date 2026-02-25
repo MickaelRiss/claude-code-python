@@ -56,7 +56,7 @@ def main():
         print(completion_message)
         completion_first_tool = chat.choices[0].message.tool_calls[0]
         print(completion_first_tool)
-        tool_name = completion_first_tool.function.arguments
+        tool_name = completion_first_tool.function.name
         print(tool_name)
         tool_argument = json.loads(completion_first_tool.function.arguments)
         print(tool_argument)
