@@ -81,30 +81,23 @@ def main():
 
         for tool_call in message_assistant.tool_calls or []:
             tool_args = json.loads(tool_call.function.arguments)  # type: ignore
+            result = ""
 
             if tool_call.function.name == "Read":  # type: ignore
                 with open(tool_args["file_path"], "r") as f:
-                    file_content = f.read()
-
-                messages.append(
-                    {
-                        "role": "tool",
-                        "tool_call_id": tool_call.id,
-                        "content": file_content,
-                    }
-                )
+                    result = f.read()
 
             if tool_call.function.name == "Write":  # type: ignore
                 with open(tool_args["file_path"], "w") as f:
-                    file_content = f.write(tool_args["content"])
+                    result = f.write(tool_args["content"])
 
-                messages.append(
-                    {
-                        "role": "tool",
-                        "tool_call_id": tool_call.id,
-                        "content": file_content,
-                    }
-                )
+            messages.append(
+                {
+                    "role": "tool",
+                    "tool_call_id": tool_call.id,
+                    "content": result,
+                }
+            )
 
     if not chat.choices or len(chat.choices) == 0:
         raise RuntimeError("no choices in response")
