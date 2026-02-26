@@ -88,7 +88,8 @@ def main():
 
             elif tool_call.function.name == "Write":  # type: ignore
                 with open(tool_args["file_path"], "w") as f:
-                    result = f.write(tool_args["content"])
+                    f.write(tool_args["content"])
+                    result = "Content successfully written in the file"
 
             messages.append(
                 {
