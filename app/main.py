@@ -39,7 +39,28 @@ def main():
                     "required": ["file_path"],
                 },
             },
-        }
+        },
+        {
+            "type": "function",
+            "function": {
+                "name": "Write",
+                "description": "Write content to a file",
+                "parameters": {
+                    "type": "object",
+                    "properties": {
+                        "file_path": {
+                            "type": "string",
+                            "description": "The path of the file to write to",
+                        },
+                        "content": {
+                            "type": "string",
+                            "description": "The content to write to the file",
+                        },
+                    },
+                    "required": ["file_path", "content"],
+                },
+            },
+        },
     ]
 
     messages = [{"role": "user", "content": args.p}]
@@ -47,8 +68,8 @@ def main():
     while True:
         chat = client.chat.completions.create(
             model="anthropic/claude-haiku-4.5",
-            messages=messages,
-            tools=tools,
+            messages=messages,  # type: ignore
+            tools=tools,  # type: ignore
         )
 
         if not chat.choices[0].message.tool_calls:
@@ -58,11 +79,23 @@ def main():
         messages.append(message_assistant.model_dump(exclude_none=True))
 
         for tool_call in message_assistant.tool_calls or []:
-            tool_args = json.loads(tool_call.function.arguments)
+            tool_args = json.loads(tool_call.function.arguments)  # type: ignore
 
-            if tool_call.function.name == "Read":
+            if tool_call.function.name == "Read":  # type: ignore
                 with open(tool_args["file_path"], "r") as f:
                     file_content = f.read()
+
+                messages.append(
+                    {
+                        "role": "tool",
+                        "tool_call_id": tool_call.id,
+                        "content": file_content,
+                    }
+                )
+
+            if tool_call.function.name == "Write":  # type: ignore
+                with open(tool_args["file_path"], "w") as f:
+                    file_content = f.write(tool_args["content"])
 
                 messages.append(
                     {
