@@ -67,8 +67,8 @@ def main():
 
     while True:
         chat = client.chat.completions.create(
-            # model="anthropic/claude-haiku-4.5",
-            model="openrouter/free",
+            model="anthropic/claude-haiku-4.5",
+            # model="openrouter/free",
             messages=messages,  # type: ignore
             tools=tools,  # type: ignore
         )
