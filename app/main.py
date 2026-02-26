@@ -86,7 +86,7 @@ def main():
                 with open(tool_args["file_path"], "r") as f:
                     result = f.read()
 
-            if tool_call.function.name == "Write":  # type: ignore
+            elif tool_call.function.name == "Write":  # type: ignore
                 with open(tool_args["file_path"], "w") as f:
                     result = f.write(tool_args["content"])
 
