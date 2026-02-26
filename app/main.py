@@ -42,17 +42,38 @@ def main():
         }
     ]
 
-    chat = client.chat.completions.create(
-        model="anthropic/claude-haiku-4.5",
-        messages=[{"role": "user", "content": args.p}],
-        tools=tools,
-    )
+    messages = [{"role": "user", "content": args.p}]
 
-    for tool_calls in chat.choices[0].message.tool_calls or []:
-        args = json.loads(tool_calls.function.arguments)
-        if tool_calls.function.name == "Read":
-            with open(args["file_path"]) as f:
-                print(f.read())
+    while True:
+        chat = client.chat.completions.create(
+            model="openrouter/free",
+            messages=messages,
+            tools=tools,
+        )
+
+        print("Voici Chat:")
+        print(chat.model_dump(exclude_none=True))
+
+        if not chat.choices[0].message.tool_calls:
+            break
+
+        message_assistant = chat.choices[0].message
+        messages.append(message_assistant.model_dump())
+
+        for tool_call in message_assistant.tool_calls or []:
+            tool_args = json.loads(tool_call.function.arguments)
+
+            if tool_call.function.name == "Read":
+                with open(tool_args["file_path"], "r") as f:
+                    file_content = f.read()
+
+                messages.append(
+                    {
+                        "role": "tool",
+                        "tool_call_id": tool_call.id,
+                        "content": file_content,
+                    }
+                )
 
     if not chat.choices or len(chat.choices) == 0:
         raise RuntimeError("no choices in response")
