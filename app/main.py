@@ -46,19 +46,16 @@ def main():
 
     while True:
         chat = client.chat.completions.create(
-            model="openrouter/free",
+            model="anthropic/claude-haiku-4.5",
             messages=messages,
             tools=tools,
         )
-
-        print("Voici Chat:")
-        print(chat.model_dump(exclude_none=True))
 
         if not chat.choices[0].message.tool_calls:
             break
 
         message_assistant = chat.choices[0].message
-        messages.append(message_assistant.model_dump())
+        messages.append(message_assistant.model_dump(exclude_none=True))
 
         for tool_call in message_assistant.tool_calls or []:
             tool_args = json.loads(tool_call.function.arguments)
