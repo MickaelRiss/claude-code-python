@@ -98,7 +98,7 @@ def main():
 
         for tool_call in message_assistant.tool_calls or []:
             tool_args = json.loads(tool_call.function.arguments)  # type: ignore
-            print("voici tool_args:", tool_args)
+            # print("voici tool_args:", tool_args)
             result = ""
 
             if tool_call.function.name == "Read":  # type: ignore
