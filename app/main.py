@@ -98,7 +98,7 @@ def main():
 
         for tool_call in message_assistant.tool_calls or []:
             tool_args = json.loads(tool_call.function.arguments)  # type: ignore
-            # print("voici tool_args:", tool_args)
+            print("Voici tool_args:", tool_args)
             result = ""
 
             if tool_call.function.name == "Read":  # type: ignore
@@ -115,6 +115,8 @@ def main():
                 result = subprocess.run(
                     command, shell=True, capture_output=True, text=True
                 )
+
+                result = result.stdout + result.stderr
 
             messages.append(
                 {
