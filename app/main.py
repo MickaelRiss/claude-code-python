@@ -1,6 +1,7 @@
 import argparse
 import json
 import os
+import subprocess
 import sys
 
 from dotenv import load_dotenv
@@ -61,6 +62,23 @@ def main():
                 },
             },
         },
+        {
+            "type": "function",
+            "function": {
+                "name": "Bash",
+                "description": "Execute a shell command",
+                "parameters": {
+                    "type": "object",
+                    "properties": {
+                        "command": {
+                            "type": "string",
+                            "description": "The command to execute",
+                        }
+                    },
+                    "required": ["command"],
+                },
+            },
+        },
     ]
 
     messages = [{"role": "user", "content": args.p}]
@@ -80,6 +98,7 @@ def main():
 
         for tool_call in message_assistant.tool_calls or []:
             tool_args = json.loads(tool_call.function.arguments)  # type: ignore
+            print("voici tool_args:", tool_args)
             result = ""
 
             if tool_call.function.name == "Read":  # type: ignore
@@ -90,6 +109,12 @@ def main():
                 with open(tool_args["file_path"], "w") as f:
                     f.write(tool_args["content"])
                     result = "Content successfully written in the file"
+
+            elif tool_call.function.name == "Bash":  # type: ignore
+                command = tool_args["command"]
+                result = subprocess.run(
+                    command, shell=True, capture_output=True, text=True
+                )
 
             messages.append(
                 {

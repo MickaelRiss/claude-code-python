@@ -23,6 +23,8 @@ and uncomment the relevant code, and submit to pass the first stage:
 codecrafters submit
 ```
 
+Mickael
+
 # Stage 2 & beyond
 
 Note: This section is for stages 2 and beyond.
